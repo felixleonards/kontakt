@@ -4,32 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#e8ebe8">
   <title>Felix Leonards</title>
   <meta name="description" content="Kontakt von Felix Leonards, Universität St.Gallen">
   <style>
     :root {
-      --bg: #f4f6f4;
+      --bg: #e8ebe8;
       --card: #ffffff;
       --text: #1b1f1c;
       --muted: #5c665f;
-      --line: #dfe5e0;
-      --accent: #00802f;
-      --accent-text: #ffffff;
-      --secondary: #eef4ef;
-      --secondary-text: #0d5c25;
+      --line: #e3e8e4;
+      --green: #0a5f2d;
+      --green-soft: #eef4ef;
     }
     @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #111412;
-        --card: #1a1f1c;
-        --text: #eef2ef;
-        --muted: #a3ada6;
-        --line: #2c3430;
-        --accent: #00802f;
-        --accent-text: #ffffff;
-        --secondary: #232a26;
-        --secondary-text: #bfe5cb;
-      }
+      :root { --bg: #101311; }
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; }
@@ -46,34 +35,44 @@
     }
     .card {
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 32px 24px 24px;
-      text-align: center;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10);
+    }
+    .banner {
+      position: relative;
+      height: 130px;
+      background: #c9ccca url("campus.jpg") center / cover no-repeat;
+    }
+    .banner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10, 95, 45, 0) 30%, rgba(10, 95, 45, 0.45));
     }
     .avatar {
+      position: relative;
+      z-index: 1;
       display: block;
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 18px;
+      width: 124px;
+      height: 124px;
+      margin: -62px auto 0;
       border-radius: 50%;
+      border: 4px solid var(--card);
       object-fit: cover;
-      background: var(--secondary);
-      border: 3px solid var(--card);
-      box-shadow: 0 0 0 2px var(--accent);
+      background: var(--green-soft);
+    }
+    .content {
+      padding: 14px 24px 24px;
+      text-align: center;
     }
     h1 {
-      margin: 0;
+      margin: 0 0 26px;
       font-size: 26px;
       font-weight: 650;
       letter-spacing: -0.2px;
-    }
-    .org {
-      margin: 6px 0 28px;
-      color: var(--muted);
-      font-size: 16px;
     }
     .buttons {
       display: flex;
@@ -96,41 +95,59 @@
     }
     .btn:active { transform: scale(0.98); }
     .btn svg { width: 20px; height: 20px; flex: none; }
-    .primary { background: var(--accent); color: var(--accent-text); }
-    .primary:hover { filter: brightness(1.08); }
-    .secondary { background: var(--secondary); color: var(--secondary-text); }
+    .primary { background: var(--green); color: #ffffff; }
+    .primary:hover { filter: brightness(1.1); }
+    .secondary { background: var(--green-soft); color: var(--green); }
     .secondary:hover { filter: brightness(0.97); }
     .mail {
-      margin: 20px 0 0;
+      margin: 18px 0 0;
       font-size: 15px;
       color: var(--muted);
       word-break: break-all;
     }
     .mail a { color: inherit; }
+    .logo {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+    .logo img {
+      display: block;
+      width: 180px;
+      height: auto;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
   <main class="card">
-    <img class="avatar" src="foto.jpg" alt="Felix Leonards" width="120" height="120">
-    <h1>Felix Leonards</h1>
-    <p class="org" data-de="Universität St.Gallen" data-en="University of St.Gallen">Universität St.Gallen</p>
+    <div class="banner" aria-hidden="true"></div>
+    <img class="avatar" src="foto.jpg" alt="Felix Leonards" width="124" height="124">
 
-    <div class="buttons">
-      <a class="btn primary" href="kontakt.vcf">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M19 8v6M16 11h6"/></svg>
-        <span data-de="Kontakt speichern" data-en="Save contact">Kontakt speichern</span>
-      </a>
-      <a class="btn secondary" href="https://www.linkedin.com/in/felix-leonards/">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>
-        <span data-de="LinkedIn-Profil" data-en="LinkedIn profile">LinkedIn-Profil</span>
-      </a>
-      <a class="btn secondary" href="mailto:felix.leonards@unisg.ch">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-        <span data-de="E-Mail schreiben" data-en="Send email">E-Mail schreiben</span>
-      </a>
+    <div class="content">
+      <h1>Felix Leonards</h1>
+
+      <div class="buttons">
+        <a class="btn primary" href="kontakt.vcf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M19 8v6M16 11h6"/></svg>
+          <span data-de="Kontakt speichern" data-en="Save contact">Kontakt speichern</span>
+        </a>
+        <a class="btn secondary" href="https://www.linkedin.com/in/felix-leonards/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>
+          <span data-de="LinkedIn-Profil" data-en="LinkedIn profile">LinkedIn-Profil</span>
+        </a>
+        <a class="btn secondary" href="mailto:felix.leonards@unisg.ch?subject=Happy%20to%20connect&amp;body=Hi%20Felix%2C%0D%0A%0D%0Ahappy%20to%20connect!%0D%0A%0D%0ABest%20regards%0D%0A">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <span data-de="E-Mail schreiben" data-en="Send email">E-Mail schreiben</span>
+        </a>
+      </div>
+
+      <p class="mail"><a href="mailto:felix.leonards@unisg.ch?subject=Happy%20to%20connect&amp;body=Hi%20Felix%2C%0D%0A%0D%0Ahappy%20to%20connect!%0D%0A%0D%0ABest%20regards%0D%0A">felix.leonards@unisg.ch</a></p>
+
+      <div class="logo">
+        <img src="logo-hsg.png" alt="Universität St.Gallen" width="180" height="38">
+      </div>
     </div>
-
-    <p class="mail"><a href="mailto:felix.leonards@unisg.ch">felix.leonards@unisg.ch</a></p>
   </main>
 
   <script>
