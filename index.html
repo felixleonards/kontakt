@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#e8ebe8">
+  <meta name="theme-color" content="#ffffff">
   <title>Felix Leonards</title>
   <meta name="description" content="Kontakt von Felix Leonards, Universität St.Gallen">
   <style>
     :root {
-      --bg: #e8ebe8;
+      --bg: #ffffff;
       --card: #ffffff;
       --text: #1b1f1c;
       --muted: #5c665f;
@@ -17,10 +17,15 @@
       --green: #0a5f2d;
       --green-soft: #eef4ef;
     }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #101311; }
-    }
     * { box-sizing: border-box; }
+    #flow {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
     html, body { margin: 0; }
     body {
       min-height: 100vh;
@@ -34,12 +39,15 @@
       -webkit-font-smoothing: antialiased;
     }
     .card {
+      position: relative;
+      z-index: 1;
       width: 100%;
       max-width: 380px;
       background: var(--card);
+      border: 1px solid rgba(12, 19, 16, 0.08);
       border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10);
+      box-shadow: 0 18px 48px rgba(12, 19, 16, 0.12);
     }
     .banner {
       position: relative;
@@ -120,6 +128,7 @@
   </style>
 </head>
 <body>
+  <canvas id="flow" aria-hidden="true"></canvas>
   <main class="card">
     <div class="banner" aria-hidden="true"></div>
     <img class="avatar" src="foto.jpg" alt="Felix Leonards" width="124" height="124">
@@ -159,6 +168,123 @@
       for (var i = 0; i < nodes.length; i++) {
         nodes[i].textContent = nodes[i].getAttribute("data-en");
       }
+    })();
+
+    // Hintergrund: gruene Striche, die einem ruhigen Stroemungsfeld folgen
+    (function () {
+      var canvas = document.getElementById("flow");
+      var g = canvas.getContext && canvas.getContext("2d");
+      if (!g) return;
+
+      var GREEN = "0,128,47", INK = "12,19,16";
+      var STYLES = [
+        [GREEN, 0.85, 1.5],
+        [GREEN, 0.55, 1.15],
+        [GREEN, 0.32, 0.9],
+        [INK, 0.5, 0.95]
+      ];
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var W = 0, H = 0, parts = [], raf = 0, last = 0;
+      var pointer = { x: -1e5, y: -1e5 };
+
+      function field(x, y, t) {
+        return Math.sin(x * 0.0017 + t * 0.00019) * 2.2 +
+               Math.cos(y * 0.0017 * 1.35 - t * 0.00015) * 1.8 +
+               Math.sin((x + y) * 0.0017 * 0.55 + t * 0.0001);
+      }
+
+      function spawn(p) {
+        p.x = Math.random() * W;
+        p.y = Math.random() * H;
+        p.px = p.x;
+        p.py = p.y;
+        p.life = 3500 + Math.random() * 4500;
+      }
+
+      function resize() {
+        W = Math.max(1, window.innerWidth);
+        H = Math.max(1, window.innerHeight);
+        var r = Math.min(1.5, window.devicePixelRatio || 1);
+        canvas.width = Math.round(W * r);
+        canvas.height = Math.round(H * r);
+        g.setTransform(r, 0, 0, r, 0, 0);
+        var n = Math.round(Math.min(1500, Math.max(W >= 900 ? 700 : 450, (W * H) / 1400)));
+        parts = [];
+        for (var i = 0; i < n; i++) {
+          var p = { v: 0.55 + Math.random() * 0.9, s: i % 7 === 0 ? 3 : Math.floor(i / 3) % 3 };
+          spawn(p);
+          p.life *= Math.random();
+          parts.push(p);
+        }
+        g.clearRect(0, 0, W, H);
+        if (reduce) paintStill();
+      }
+
+      function paintStill() {
+        g.clearRect(0, 0, W, H);
+        g.fillStyle = "rgba(" + GREEN + ",0.25)";
+        for (var i = 0; i < parts.length; i++) g.fillRect(parts[i].x, parts[i].y, 1.6, 1.6);
+      }
+
+      function frame(t) {
+        var k = last ? Math.min(2.5, (t - last) / 16.667) : 1;
+        last = t;
+        g.globalCompositeOperation = "destination-out";
+        g.fillStyle = "rgba(0,0,0," + (1 - Math.pow(1 - 0.09, k)).toFixed(4) + ")";
+        g.fillRect(0, 0, W, H);
+        g.globalCompositeOperation = "source-over";
+
+        for (var i = 0; i < parts.length; i++) {
+          var p = parts[i];
+          p.px = p.x;
+          p.py = p.y;
+          p.life -= 16.667 * k;
+          if (p.life <= 0) { spawn(p); continue; }
+          var a = field(p.x, p.y, t);
+          var dx = Math.cos(a) * p.v * 1.5;
+          var dy = Math.sin(a) * p.v * 1.5;
+          var ox = p.x - pointer.x, oy = p.y - pointer.y, d2 = ox * ox + oy * oy;
+          if (d2 < 22000) {
+            var d = Math.sqrt(d2) + 0.001, f = ((22000 - d2) / 22000) * 6;
+            dx += (ox / d) * f;
+            dy += (oy / d) * f;
+          }
+          p.x += dx * k;
+          p.y += dy * k;
+          if (p.x < -12) { p.x = W + 12; p.px = p.x; } else if (p.x > W + 12) { p.x = -12; p.px = p.x; }
+          if (p.y < -12) { p.y = H + 12; p.py = p.y; } else if (p.y > H + 12) { p.y = -12; p.py = p.y; }
+        }
+
+        g.lineCap = "round";
+        for (var s = 0; s < STYLES.length; s++) {
+          g.strokeStyle = "rgba(" + STYLES[s][0] + "," + STYLES[s][1] + ")";
+          g.lineWidth = STYLES[s][2];
+          g.beginPath();
+          for (var j = 0; j < parts.length; j++) {
+            var q = parts[j];
+            if (q.s !== s) continue;
+            var sx = q.x - q.px, sy = q.y - q.py, len = Math.hypot(sx, sy);
+            if (len < 0.6) continue;
+            if (len > 10) { sx *= 10 / len; sy *= 10 / len; }
+            g.moveTo(q.x - sx, q.y - sy);
+            g.lineTo(q.x, q.y);
+          }
+          g.stroke();
+        }
+        raf = requestAnimationFrame(frame);
+      }
+
+      function start() { if (!reduce && !raf) { last = 0; raf = requestAnimationFrame(frame); } }
+      function stop() { cancelAnimationFrame(raf); raf = 0; }
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("pointermove", function (e) { pointer.x = e.clientX; pointer.y = e.clientY; }, { passive: true });
+      window.addEventListener("pointerleave", function () { pointer.x = -1e5; pointer.y = -1e5; });
+      window.addEventListener("pointerup", function (e) { if (e.pointerType !== "mouse") { pointer.x = -1e5; pointer.y = -1e5; } });
+      document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start(); });
+
+      resize();
+      start();
     })();
   </script>
 </body>
